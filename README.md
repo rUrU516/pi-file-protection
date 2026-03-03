@@ -1,4 +1,4 @@
-# Pi File Protection / Pi 文件保护
+# Pi Agent File Protection / Pi Agent 文件保护
 
 A Pi extension that protects your files and system from accidental destructive operations.
 
