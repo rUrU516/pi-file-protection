@@ -1,5 +1,6 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { isToolCallEventType } from "@mariozechner/pi-coding-agent";
+import { CONFIRM_MESSAGE } from "./constants";
 
 const CONFIRM_PATTERNS = [
   /\bgit\b/i,   // git as a standalone word (start/end of line or surrounded by whitespace)
@@ -11,7 +12,7 @@ export function registerGitProtection(pi: ExtensionAPI) {
 
     if (isToolCallEventType("bash", event)) {
       if (CONFIRM_PATTERNS.some(pattern => pattern.test(event.input.command))) {
-        const ok = await ctx.ui.confirm("确定要执行该命令么？", `${event.input.command}`);
+        const ok = await ctx.ui.confirm(CONFIRM_MESSAGE, `${event.input.command}`);
         if (!ok) return { block: true, reason: "Refused by the user." };
       }
     }
