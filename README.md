@@ -4,6 +4,13 @@ A Pi extension that protects your files and system from accidental destructive o
 
 一个保护您的文件和系统免受意外破坏操作的 Pi 扩展。
 
+<table>
+<tr>
+<td><img src="./screenshot-sudo.png" width="400"/></td>
+<td><img src="./screenshot-git.png" width="400"/></td>
+</tr>
+</table>
+
 ## Features / 功能
 
 ### Git Protection / Git 保护
