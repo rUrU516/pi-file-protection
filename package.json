@@ -4,8 +4,8 @@
   "description": "Pi extension that confirms before delete/edit operations - protects files from accidental changes",
   "keywords": ["pi-package", "file-protection", "security"],
   "type": "module",
-  "main": "./index.ts",
+  "main": "./src/index.ts",
   "pi": {
-    "extensions": ["./index.ts"]
+    "extensions": ["./src/index.ts"]
   }
 }
