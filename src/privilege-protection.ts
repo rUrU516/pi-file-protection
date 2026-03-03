@@ -2,7 +2,8 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { isToolCallEventType } from "@mariozechner/pi-coding-agent";
 
 const CONFIRM_PATTERNS = [
-  /\bsudo\b/i,   // sudo commands (elevated privileges)
+  /\bsudo\b/i,                    // sudo commands (elevated privileges)
+  /\b(chmod|chown)\b.*777/i,     // dangerous permissions (777 = full access for everyone)
 ]
 
 export function registerPrivilegeProtection(pi: ExtensionAPI) {
