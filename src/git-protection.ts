@@ -2,7 +2,7 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { isToolCallEventType } from "@mariozechner/pi-coding-agent";
 
 const CONFIRM_PATTERNS = [
-  /(^|\s)git(\s|$)/i,   // git as a standalone word (start/end of line or surrounded by whitespace)
+  /\bgit\b/i,   // git as a standalone word (start/end of line or surrounded by whitespace)
 ]
 
 export function registerGitProtection(pi: ExtensionAPI) {
