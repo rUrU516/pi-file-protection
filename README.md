@@ -38,6 +38,16 @@ Prompts for confirmation before:
 pi install github.com/rUrU516/pi-file-protection
 ```
 
+## Update / 更新
+
+To get the latest features and protections:
+
+获取最新功能和保护：
+
+```bash
+pi update
+```
+
 ## Usage / 使用
 
 Once installed, the extension automatically activates and will prompt you for confirmation before executing any protected operations.
