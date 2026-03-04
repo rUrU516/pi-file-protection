@@ -6,6 +6,8 @@ const CONFIRM_PATTERNS = [
   /\brm\b/i,
   /\brmdir\b/i,
   /\bunlink\b/i,
+  /\bmv\b/i,
+  /delete/i,
 ]
 
 export function registerDeleteProtection(pi: ExtensionAPI) {

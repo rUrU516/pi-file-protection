@@ -2,10 +2,16 @@
   "name": "pi-file-protection",
   "version": "1.0.0",
   "description": "Pi extension that confirms before delete/edit operations - protects files from accidental changes",
-  "keywords": ["pi-package", "file-protection", "security"],
+  "keywords": [
+    "pi-package",
+    "file-protection",
+    "security"
+  ],
   "type": "module",
   "main": "./src/index.ts",
   "pi": {
-    "extensions": ["./src/index.ts"]
+    "extensions": [
+      "./src/index.ts"
+    ]
   }
 }
