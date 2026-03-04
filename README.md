@@ -18,8 +18,8 @@ Prompts for confirmation before executing any `git` commands.
 执行任何 `git` 命令前会要求确认。
 
 ### Delete Protection / 删除保护
-Prompts for confirmation before running destructive commands like `rm`, `rmdir`, `unlink`.
-执行破坏性命令（如 `rm`、`rmdir`、`unlink`）前会要求确认。
+Prompts for confirmation before running destructive commands like `rm`, `rmdir`, `unlink`, `mv`, or any command containing "delete" (e.g., `find -delete`, `kubectl delete`).
+执行破坏性命令（如 `rm`、`rmdir`、`unlink`、`mv`）或包含 "delete" 的命令（如 `find -delete`、`kubectl delete`）前会要求确认。
 
 ### Edit Protection / 编辑保护
 Prompts for confirmation before:
