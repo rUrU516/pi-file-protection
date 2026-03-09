@@ -41,8 +41,14 @@ Prompts for confirmation before:
 
 ## Installation / 安装
 
+**推荐方式 (Recommended):**
 ```bash
-pi install github.com/rUrU516/pi-file-protection
+pi install npm:pi-file-protection
+```
+
+**从源码安装 (From source):**
+```bash
+pi install git:github.com/rUrU516/pi-file-protection
 ```
 
 ## Update / 更新

@@ -4,6 +4,7 @@ import { CONFIRM_MESSAGE } from "./constants";
 
 const CONFIRM_PATTERNS = [
   /\bgit\b/i,   // git as a standalone word (start/end of line or surrounded by whitespace)
+  /\bgh\b/i,
 ]
 
 export function registerGitProtection(pi: ExtensionAPI) {

@@ -1,6 +1,6 @@
 {
   "name": "pi-file-protection",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Pi extension that confirms before delete/edit operations - protects files from accidental changes",
   "keywords": [
     "pi-package",
@@ -13,5 +13,16 @@
     "extensions": [
       "./src/index.ts"
     ]
+  },
+  "files": [
+    "src",
+    "README.md",
+    "package-lock.json"
+  ],
+  "license": "MIT",
+  "author": "Zhuoru <zhuoruli0516@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rUrU516/pi-file-protection.git"
   }
 }
