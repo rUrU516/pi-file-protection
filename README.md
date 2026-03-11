@@ -13,9 +13,9 @@ A Pi extension that protects your files and system from accidental destructive o
 
 ## Features / 功能
 
-### Git Protection / Git 保护
-Prompts for confirmation before executing any `git` commands.
-执行任何 `git` 命令前会要求确认。
+### Git & GitHub CLI Protection / Git 与 GitHub CLI 保护
+Prompts for confirmation before executing blacklisted `git` commands, and before executing any `gh` commands.
+执行黑名单中的 `git` 命令前会要求确认，并且执行任何 `gh` 命令前也会要求确认。
 
 ### Delete Protection / 删除保护
 Prompts for confirmation before running destructive commands like `rm`, `rmdir`, `unlink`, `mv`, or any command containing "delete" (e.g., `find -delete`, `kubectl delete`).
