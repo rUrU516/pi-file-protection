@@ -1,6 +1,6 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { isToolCallEventType } from "@mariozechner/pi-coding-agent";
-import { CONFIRM_MESSAGE, protectionEnabled } from "./constants";
+import { CONFIRM_MESSAGE, state } from "./constants";
 
 const CONFIRM_PATTERNS = [
   /\bsudo\b/i,                    // sudo commands (elevated privileges)
@@ -10,7 +10,7 @@ const CONFIRM_PATTERNS = [
 export function registerPrivilegeProtection(pi: ExtensionAPI) {
 
   pi.on("tool_call", async (event, ctx) => {
-    if (!protectionEnabled) return;
+    if (!state.protectionEnabled) return;
 
     if (isToolCallEventType("bash", event)) {
       if (CONFIRM_PATTERNS.some(pattern => pattern.test(event.input.command))) {

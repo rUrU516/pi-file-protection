@@ -1,6 +1,6 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { isToolCallEventType } from "@mariozechner/pi-coding-agent";
-import { CONFIRM_MESSAGE, protectionEnabled } from "./constants";
+import { CONFIRM_MESSAGE, state } from "./constants";
 
 const GIT_BLACKLIST_PATTERNS = [
   /\bgit\s+push\b/i,
@@ -28,7 +28,7 @@ const GH_CONFIRM_PATTERN = /\bgh\b/i;
 export function registerGitProtection(pi: ExtensionAPI) {
 
   pi.on("tool_call", async (event, ctx) => {
-    if (!protectionEnabled) return;
+    if (!state.protectionEnabled) return;
 
     if (isToolCallEventType("bash", event)) {
       const shouldConfirmGit = GIT_BLACKLIST_PATTERNS.some(pattern => pattern.test(event.input.command));

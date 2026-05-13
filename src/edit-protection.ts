@@ -1,6 +1,6 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { isToolCallEventType } from "@mariozechner/pi-coding-agent";
-import { CONFIRM_MESSAGE, protectionEnabled } from "./constants";
+import { CONFIRM_MESSAGE, state } from "./constants";
 
 const CONFIRM_PATTERNS = [
   /\btruncate\b/i,   // e.g. truncate -s 0 filename.txt
@@ -12,7 +12,7 @@ const CONFIRM_PATTERNS = [
 export function registerEditProtection(pi: ExtensionAPI) {
 
   pi.on("tool_call", async (event, ctx) => {
-    if (!protectionEnabled) return;
+    if (!state.protectionEnabled) return;
 
     if (isToolCallEventType("write", event)) {
         const ok = await ctx.ui.confirm(CONFIRM_MESSAGE, `write ${event.input.path}`);
@@ -21,7 +21,7 @@ export function registerEditProtection(pi: ExtensionAPI) {
   });
 
   pi.on("tool_call", async (event, ctx) => {
-    if (!protectionEnabled) return;
+    if (!state.protectionEnabled) return;
 
     if (isToolCallEventType("edit", event)) {
         const ok = await ctx.ui.confirm(CONFIRM_MESSAGE, `edit ${event.input.path}`);
@@ -30,7 +30,7 @@ export function registerEditProtection(pi: ExtensionAPI) {
   });
 
   pi.on("tool_call", async (event, ctx) => {
-    if (!protectionEnabled) return;
+    if (!state.protectionEnabled) return;
 
     if (isToolCallEventType("bash", event)) {
       if (CONFIRM_PATTERNS.some(pattern => pattern.test(event.input.command))) {

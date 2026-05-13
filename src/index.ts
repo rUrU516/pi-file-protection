@@ -3,7 +3,7 @@ import { registerDeleteProtection } from "./delete-protection";
 import { registerEditProtection } from "./edit-protection";
 import { registerGitProtection } from "./git-protection";
 import { registerPrivilegeProtection } from "./privilege-protection";
-import { setProtectionEnabled } from "./constants";
+import { state } from "./constants";
 
 export default function (pi: ExtensionAPI) {
 
@@ -20,10 +20,10 @@ export default function (pi: ExtensionAPI) {
     },
     handler: async (args, ctx) => {
       if (args === "on") {
-        setProtectionEnabled(true);
+        state.protectionEnabled = true;
         ctx.ui.notify("🛡️ Protection enabled", "info");
       } else if (args === "off") {
-        setProtectionEnabled(false);
+        state.protectionEnabled = false;
         ctx.ui.notify("⚠️ Protection disabled", "info");
       } else {
         ctx.ui.notify("Usage: /protect on | /protect off", "info");
