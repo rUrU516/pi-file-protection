@@ -12,24 +12,32 @@ function rgbFg(r: number, g: number, b: number): string {
   return `\x1b[38;2;${r};${g};${b}m`;
 }
 
-// Shield gradient: restrained blue tones
+// Shield gradient: richer but restrained blue tones
 const SHIELD_COLORS = [
+  [30, 58, 138],    // blue-900
+  [30, 64, 175],    // blue-800
   [29, 78, 216],    // blue-700
   [37, 99, 235],    // blue-600
   [59, 130, 246],   // blue-500
+  [96, 165, 250],   // blue-400
+  [59, 130, 246],   // blue-500
   [37, 99, 235],    // blue-600
+  [29, 78, 216],    // blue-700
   [30, 64, 175],    // blue-800
-  [37, 99, 235],    // blue-600
 ];
 
-// Fire gradient: restrained red tones
+// Fire gradient: richer but restrained red tones
 const FIRE_COLORS = [
+  [127, 29, 29],    // red-900
   [153, 27, 27],    // red-800
   [185, 28, 28],    // red-700
   [220, 38, 38],    // red-600
   [239, 68, 68],    // red-500
+  [248, 113, 113],  // red-400
+  [239, 68, 68],    // red-500
   [220, 38, 38],    // red-600
   [185, 28, 28],    // red-700
+  [153, 27, 27],    // red-800
 ];
 
 function renderStatusLabel(colors: number[][], text: string): string {
@@ -58,7 +66,7 @@ function startAnimation(ctx: { ui: { setWidget: (key: string, lines: string[]) =
   };
 
   render();
-  animInterval = setInterval(render, 100);
+  animInterval = setInterval(render, 800);
 }
 
 function stopAnimation() {
