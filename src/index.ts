@@ -41,19 +41,43 @@ const FIRE_COLORS = [
   [153, 27, 27],    // red-800
 ];
 
-function renderStatusLabel(): string {
+function renderStatusLabel(frame: number): string {
   const colors = state.protectionEnabled ? SHIELD_COLORS : FIRE_COLORS;
   const text = state.protectionEnabled ? "[ SHIELD ON  ]" : "[ SHIELD OFF ]";
-  const color = colors[Math.floor(colors.length / 2)];
+  const color = colors[frame % colors.length];
   return `${rgbFg(color[0], color[1], color[2])}${text}${RESET}`;
 }
 
+let activeProtectionEditor: ProtectionEditor | undefined;
+
 class ProtectionEditor extends CustomEditor {
+  private animationTimer?: ReturnType<typeof setInterval>;
+  private frame = 0;
+
+  constructor(...args: any[]) {
+    super(...args);
+    this.animationTimer = setInterval(() => {
+      this.frame++;
+      this.tui.requestRender();
+    }, 800);
+  }
+
+  refresh(): void {
+    this.tui.requestRender();
+  }
+
+  dispose(): void {
+    if (this.animationTimer) {
+      clearInterval(this.animationTimer);
+      this.animationTimer = undefined;
+    }
+  }
+
   render(width: number): string[] {
     const lines = super.render(width);
     if (lines.length === 0) return lines;
 
-    const label = ` ${renderStatusLabel()} `;
+    const label = ` ${renderStatusLabel(this.frame)} `;
     const labelWidth = visibleWidth(label);
     const first = 0;
 
@@ -67,9 +91,11 @@ class ProtectionEditor extends CustomEditor {
 
 function installProtectionEditor(ctx: { ui: { setEditorComponent: (factory: unknown) => void; setWidget: (key: string, lines?: string[]) => void } }) {
   ctx.ui.setWidget("protection", undefined);
-  ctx.ui.setEditorComponent((tui: unknown, theme: unknown, keybindings: unknown) =>
-    new ProtectionEditor(tui, theme, keybindings)
-  );
+  ctx.ui.setEditorComponent((tui: unknown, theme: unknown, keybindings: unknown) => {
+    activeProtectionEditor?.dispose();
+    activeProtectionEditor = new ProtectionEditor(tui, theme, keybindings);
+    return activeProtectionEditor;
+  });
 }
 
 export default function (pi: ExtensionAPI) {
@@ -83,6 +109,11 @@ export default function (pi: ExtensionAPI) {
     installProtectionEditor(ctx);
   });
 
+  pi.on("session_shutdown", async () => {
+    activeProtectionEditor?.dispose();
+    activeProtectionEditor = undefined;
+  });
+
   pi.registerCommand("protect", {
     description: "Toggle file protection on/off",
     getArgumentCompletions(prefix: string) {
@@ -92,9 +123,11 @@ export default function (pi: ExtensionAPI) {
     handler: async (args, ctx) => {
       if (args === "on") {
         state.protectionEnabled = true;
+        activeProtectionEditor?.refresh();
         ctx.ui.notify("🛡️ Protection enabled", "info");
       } else if (args === "off") {
         state.protectionEnabled = false;
+        activeProtectionEditor?.refresh();
         ctx.ui.notify("⚠️ Protection disabled", "info");
       } else {
         const status = state.protectionEnabled ? "🛡️ ON" : "⚠️ OFF";
