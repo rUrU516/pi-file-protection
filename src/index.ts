@@ -3,6 +3,7 @@ import { registerDeleteProtection } from "./delete-protection";
 import { registerEditProtection } from "./edit-protection";
 import { registerGitProtection } from "./git-protection";
 import { registerPrivilegeProtection } from "./privilege-protection";
+import { setProtectionEnabled } from "./constants";
 
 export default function (pi: ExtensionAPI) {
 
@@ -10,5 +11,24 @@ export default function (pi: ExtensionAPI) {
   registerEditProtection(pi);
   registerGitProtection(pi);
   registerPrivilegeProtection(pi);
+
+  pi.registerCommand("protect", {
+    description: "Toggle file protection on/off",
+    getArgumentCompletions(prefix: string) {
+      return [{ value: "on", label: "on - Enable protection" }, { value: "off", label: "off - Disable protection" }]
+        .filter((i) => i.value.startsWith(prefix));
+    },
+    handler: async (args, ctx) => {
+      if (args === "on") {
+        setProtectionEnabled(true);
+        ctx.ui.notify("🛡️ Protection enabled", "info");
+      } else if (args === "off") {
+        setProtectionEnabled(false);
+        ctx.ui.notify("⚠️ Protection disabled", "info");
+      } else {
+        ctx.ui.notify("Usage: /protect on | /protect off", "info");
+      }
+    },
+  });
 
 }
