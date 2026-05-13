@@ -1,5 +1,5 @@
-import { CustomEditor, type ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
+import { CustomEditor, getSettingsListTheme, type ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import { Container, SettingsList, truncateToWidth, visibleWidth, type SettingItem } from "@mariozechner/pi-tui";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
@@ -129,21 +129,63 @@ function installProtectionEditor(ctx: { ui: { setEditorComponent: (factory: unkn
 }
 
 async function openShieldPanel(ctx: any): Promise<void> {
-  const config = loadConfig();
-  const currentStatus = state.protectionEnabled ? "ON" : "OFF";
-  const defaultStatus = config.defaultEnabled ? "ON" : "OFF";
-  const currentOption = `Current session: ${currentStatus}`;
-  const defaultOption = `Default for future sessions: ${defaultStatus}`;
+  await ctx.ui.custom((tui: any, theme: any, _keybindings: any, done: (value?: unknown) => void) => {
+    const config = loadConfig();
+    const items: SettingItem[] = [
+      {
+        id: "current",
+        label: "Current session",
+        currentValue: state.protectionEnabled ? "ON" : "OFF",
+        values: ["ON", "OFF"],
+      },
+      {
+        id: "default",
+        label: "Default for future sessions",
+        currentValue: config.defaultEnabled ? "ON" : "OFF",
+        values: ["ON", "OFF"],
+      },
+    ];
 
-  const choice = await ctx.ui.select("Shield settings", [currentOption, defaultOption]);
-  if (choice === currentOption) {
-    setShieldEnabled(!state.protectionEnabled);
-    ctx.ui.notify(`Shield ${state.protectionEnabled ? "enabled" : "disabled"} for current session`, "info");
-  } else if (choice === defaultOption) {
-    const next = !config.defaultEnabled;
-    saveConfig({ defaultEnabled: next });
-    ctx.ui.notify(`Default shield is now ${next ? "ON" : "OFF"}`, "info");
-  }
+    const container = new Container();
+    container.addChild(
+      new (class {
+        render(_width: number) {
+          return [theme.fg("accent", theme.bold("Shield Settings")), theme.fg("dim", "Enter/Space to toggle · Esc to close"), ""];
+        }
+        invalidate() {}
+      })(),
+    );
+
+    const settingsList = new SettingsList(
+      items,
+      4,
+      getSettingsListTheme(),
+      (id, newValue) => {
+        const enabled = newValue === "ON";
+        if (id === "current") {
+          setShieldEnabled(enabled);
+        } else if (id === "default") {
+          saveConfig({ defaultEnabled: enabled });
+        }
+      },
+      () => done(undefined),
+    );
+
+    container.addChild(settingsList);
+
+    return {
+      render(width: number) {
+        return container.render(width);
+      },
+      invalidate() {
+        container.invalidate();
+      },
+      handleInput(data: string) {
+        settingsList.handleInput?.(data);
+        tui.requestRender();
+      },
+    };
+  });
 }
 
 export default function (pi: ExtensionAPI) {
