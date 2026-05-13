@@ -6,23 +6,44 @@ import { registerPrivilegeProtection } from "./privilege-protection";
 import { state } from "./constants";
 import { osNotify } from "./os-notify";
 
-// Animation frames
+// Animation frames - Shield (icy, calm, breathing)
 const SHIELD_FRAMES = [
-  "  ✨  🛡️  ✨  ",
-  "  ✨ 🛡️✨  ",
-  "   🛡️✨   ",
-  "   ✨🛡️   ",
-  "  ✨ 🛡️ ✨  ",
-  "  ✨  🛡️  ✨  ",
+  "   ✦  ·  🛡️  ·  ✦   ",
+  "   ✦ ·  🛡️  · ✦   ",
+  "    ✦ · 🛡️ · ✦    ",
+  "    ✦·  🛡️  ·✦    ",
+  "     ✦· 🛡️ ·✦     ",
+  "     ✦ ·🛡️· ✦     ",
+  "    ✦ · 🛡️ · ✦    ",
+  "   ✦ ·  🛡️  · ✦   ",
+  "   ✦ ·  ❄️  · ✦   ",
+  "    ✦ · 🛡️ · ✦    ",
+  "   ❄️  ·  🛡️  ·  ❄️   ",
+  "    ✦ · 🛡️ · ✦    ",
+  "   ✦  ·  🛡️  ·  ✦   ",
+  "    ❄️ · 🛡️ · ❄️    ",
+  "   ✦  ·  🛡️  ·  ✦   ",
+  "  ✦   ·  🛡️  ·   ✦  ",
 ];
 
+// Animation frames - Fire (wild, chaotic, burning)
 const FIRE_FRAMES = [
-  "  🔥  🔥  🔥  ",
-  "   🔥🔥🔥   ",
-  "  💥 🔥 💥  ",
-  "   🔥 🔥 🔥  ",
-  "  🔥💥🔥  ",
-  "   🔥🔥  🔥  ",
+  "   🔥  🔥  🔥   ",
+  "  🔥 🔥🔥 🔥  ",
+  "   💥🔥🔥💥   ",
+  "  🔥 💥🔥💥 🔥  ",
+  "   🔥🔥💥🔥🔥   ",
+  "  💥 🔥🔥🔥 💥  ",
+  "  🔥🔥 💥 🔥🔥  ",
+  "   💥🔥🔥🔥💥   ",
+  "  🔥 💥🔥💥 🔥  ",
+  "   🔥💥  💥🔥   ",
+  "  🔥🔥 💥🔥🔥  ",
+  "   💥  🔥  💥   ",
+  "  🔥💥🔥🔥💥🔥  ",
+  "   🔥💥  💥🔥   ",
+  "  💥🔥 💥 🔥💥  ",
+  "   🔥🔥💥🔥🔥   ",
 ];
 
 let animInterval: ReturnType<typeof setInterval> | null = null;
@@ -39,7 +60,7 @@ function startAnimation(ctx: { ui: { setWidget: (key: string, lines: string[]) =
   };
 
   render();
-  animInterval = setInterval(render, 300);
+  animInterval = setInterval(render, 200);
 }
 
 function stopAnimation() {
