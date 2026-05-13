@@ -142,19 +142,19 @@ async function openShieldPanel(ctx: any): Promise<void> {
     const items: SettingItem[] = [
       {
         id: "current",
-        label: "Current session",
+        label: "session shield",
         currentValue: state.protectionEnabled ? "on" : "off",
         values: ["on", "off"],
       },
       {
         id: "default",
-        label: "Default for future sessions",
+        label: "default shield",
         currentValue: config.defaultEnabled ? "on" : "off",
         values: ["on", "off"],
       },
       {
         id: "notifications",
-        label: "Notifications",
+        label: "notifications",
         currentValue: state.notificationEnabled ? "on" : "off",
         values: ["on", "off"],
       },
@@ -164,7 +164,7 @@ async function openShieldPanel(ctx: any): Promise<void> {
     container.addChild(
       new (class {
         render(_width: number) {
-          return [theme.fg("accent", theme.bold("Shield Settings")), theme.fg("dim", "Enter/Space to toggle · Esc to close"), ""];
+          return [theme.fg("accent", theme.bold("Pi Shield")), ""];
         }
         invalidate() {}
       })(),
