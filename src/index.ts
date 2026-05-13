@@ -79,7 +79,7 @@ function startAnimation(ctx: { ui: { setWidget: (key: string, lines: string[]) =
   const render = () => {
     const isOn = state.protectionEnabled;
     const colors = isOn ? SHIELD_COLORS : FIRE_COLORS;
-    const icon = isOn ? "🛡️" : "🔥";
+    const icon = isOn ? "\u{1F6E1}" : "🔥";
     const label = isOn ? " SHIELD  ON " : " SHIELD OFF ";
 
     // Animate by shifting color array
