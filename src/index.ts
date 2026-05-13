@@ -1,4 +1,5 @@
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import { CustomEditor, type ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import { truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
 import { registerDeleteProtection } from "./delete-protection";
 import { registerEditProtection } from "./edit-protection";
 import { registerGitProtection } from "./git-protection";
@@ -40,40 +41,35 @@ const FIRE_COLORS = [
   [153, 27, 27],    // red-800
 ];
 
-function renderStatusLabel(colors: number[][], text: string): string {
-  const midColor = colors[Math.floor(colors.length / 2)];
-  return `${rgbFg(midColor[0], midColor[1], midColor[2])}${text}${RESET}`;
+function renderStatusLabel(): string {
+  const colors = state.protectionEnabled ? SHIELD_COLORS : FIRE_COLORS;
+  const text = state.protectionEnabled ? "[ SHIELD ON  ]" : "[ SHIELD OFF ]";
+  const color = colors[Math.floor(colors.length / 2)];
+  return `${rgbFg(color[0], color[1], color[2])}${text}${RESET}`;
 }
 
-let animInterval: ReturnType<typeof setInterval> | null = null;
-let frameIndex = 0;
+class ProtectionEditor extends CustomEditor {
+  render(width: number): string[] {
+    const lines = super.render(width);
+    if (lines.length === 0) return lines;
 
-function startAnimation(ctx: { ui: { setWidget: (key: string, lines: string[]) => void } }) {
-  stopAnimation();
-  frameIndex = 0;
+    const label = ` ${renderStatusLabel()} `;
+    const labelWidth = visibleWidth(label);
+    const last = lines.length - 1;
 
-  const render = () => {
-    const isOn = state.protectionEnabled;
-    const colors = isOn ? SHIELD_COLORS : FIRE_COLORS;
-    const label = isOn ? "[ SHIELD ON  ]" : "[ SHIELD OFF ]";
+    if (width > labelWidth + 4) {
+      lines[last] = truncateToWidth(lines[last]!, width - labelWidth, "") + label;
+    }
 
-    // Animate by shifting color array
-    const shifted = [...colors.slice(frameIndex % colors.length), ...colors.slice(0, frameIndex % colors.length)];
-
-    const widget = renderStatusLabel(shifted, label);
-    ctx.ui.setWidget("protection", [widget]);
-    frameIndex++;
-  };
-
-  render();
-  animInterval = setInterval(render, 800);
-}
-
-function stopAnimation() {
-  if (animInterval !== null) {
-    clearInterval(animInterval);
-    animInterval = null;
+    return lines;
   }
+}
+
+function installProtectionEditor(ctx: { ui: { setEditorComponent: (factory: unknown) => void; setWidget: (key: string, lines?: string[]) => void } }) {
+  ctx.ui.setWidget("protection", undefined);
+  ctx.ui.setEditorComponent((tui: unknown, theme: unknown, keybindings: unknown) =>
+    new ProtectionEditor(tui, theme, keybindings)
+  );
 }
 
 export default function (pi: ExtensionAPI) {
@@ -84,11 +80,7 @@ export default function (pi: ExtensionAPI) {
   registerPrivilegeProtection(pi);
 
   pi.on("session_start", async (_event, ctx) => {
-    startAnimation(ctx);
-  });
-
-  pi.on("session_shutdown", async () => {
-    stopAnimation();
+    installProtectionEditor(ctx);
   });
 
   pi.registerCommand("protect", {
@@ -100,11 +92,9 @@ export default function (pi: ExtensionAPI) {
     handler: async (args, ctx) => {
       if (args === "on") {
         state.protectionEnabled = true;
-        startAnimation(ctx);
         ctx.ui.notify("🛡️ Protection enabled", "info");
       } else if (args === "off") {
         state.protectionEnabled = false;
-        startAnimation(ctx);
         ctx.ui.notify("⚠️ Protection disabled", "info");
       } else {
         const status = state.protectionEnabled ? "🛡️ ON" : "⚠️ OFF";
