@@ -26,7 +26,8 @@ export default function (pi: ExtensionAPI) {
         state.protectionEnabled = false;
         ctx.ui.notify("⚠️ Protection disabled", "info");
       } else {
-        ctx.ui.notify("Usage: /protect on | /protect off", "info");
+        const status = state.protectionEnabled ? "🛡️ ON" : "⚠️ OFF";
+        ctx.ui.notify(`Protection is currently ${status}. Usage: /protect on | /protect off`, "info");
       }
     },
   });
