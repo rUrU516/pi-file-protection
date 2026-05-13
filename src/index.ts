@@ -33,10 +33,29 @@ export default function (pi: ExtensionAPI) {
     },
   });
 
-  pi.on("agent_end", async (_event, _ctx) => {
-    if (!state.protectionEnabled) {
-      osNotify("⚠️ Protection Disabled", "File protection is OFF. Run /protect on to re-enable.");
+  pi.on("agent_end", async (event, _ctx) => {
+    const MAX_LENGTH = 100;
+    let summary = "";
+
+    // Find the last assistant message
+    for (let i = event.messages.length - 1; i >= 0; i--) {
+      const msg = event.messages[i];
+      if (msg.role === "assistant" && msg.content) {
+        for (const block of Array.isArray(msg.content) ? msg.content : [{ type: "text", text: msg.content }]) {
+          if (block.type === "text" && block.text) {
+            summary = block.text;
+            break;
+          }
+        }
+        if (summary) break;
+      }
     }
+
+    if (summary.length > MAX_LENGTH) {
+      summary = summary.slice(0, MAX_LENGTH) + "…";
+    }
+
+    osNotify("Pi Agent", summary || "Done.");
   });
 
 }
