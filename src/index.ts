@@ -1,11 +1,21 @@
 import { CustomEditor, type ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { dirname, join } from "node:path";
 import { registerDeleteProtection } from "./delete-protection";
 import { registerEditProtection } from "./edit-protection";
 import { registerGitProtection } from "./git-protection";
 import { registerPrivilegeProtection } from "./privilege-protection";
 import { state } from "./constants";
 import { osNotify } from "./os-notify";
+
+type ShieldConfig = {
+  defaultEnabled: boolean;
+};
+
+const CONFIG_PATH = join(homedir(), ".pi", "agent", "pi-file-protection.json");
+const DEFAULT_CONFIG: ShieldConfig = { defaultEnabled: true };
 
 // ANSI colors
 const RESET = "\x1b[0m";
@@ -40,6 +50,26 @@ const FIRE_COLORS = [
   [185, 28, 28],    // red-700
   [153, 27, 27],    // red-800
 ];
+
+function loadConfig(): ShieldConfig {
+  try {
+    if (!existsSync(CONFIG_PATH)) return DEFAULT_CONFIG;
+    const parsed = JSON.parse(readFileSync(CONFIG_PATH, "utf8")) as Partial<ShieldConfig>;
+    return { defaultEnabled: parsed.defaultEnabled ?? DEFAULT_CONFIG.defaultEnabled };
+  } catch {
+    return DEFAULT_CONFIG;
+  }
+}
+
+function saveConfig(config: ShieldConfig): void {
+  mkdirSync(dirname(CONFIG_PATH), { recursive: true });
+  writeFileSync(CONFIG_PATH, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+}
+
+function setShieldEnabled(enabled: boolean): void {
+  state.protectionEnabled = enabled;
+  activeProtectionEditor?.refresh();
+}
 
 function renderStatusLabel(frame: number): string {
   const colors = state.protectionEnabled ? SHIELD_COLORS : FIRE_COLORS;
@@ -98,6 +128,27 @@ function installProtectionEditor(ctx: { ui: { setEditorComponent: (factory: unkn
   });
 }
 
+async function openShieldPanel(ctx: any): Promise<void> {
+  const config = loadConfig();
+  const currentStatus = state.protectionEnabled ? "ON" : "OFF";
+  const defaultStatus = config.defaultEnabled ? "ON" : "OFF";
+  const currentNext = state.protectionEnabled ? "OFF" : "ON";
+  const defaultNext = config.defaultEnabled ? "OFF" : "ON";
+
+  const currentOption = `Current session: ${currentStatus} → ${currentNext}`;
+  const defaultOption = `Default for future sessions: ${defaultStatus} → ${defaultNext}`;
+
+  const choice = await ctx.ui.select("Shield settings", [currentOption, defaultOption]);
+  if (choice === currentOption) {
+    setShieldEnabled(!state.protectionEnabled);
+    ctx.ui.notify(`Shield ${state.protectionEnabled ? "enabled" : "disabled"} for current session`, "info");
+  } else if (choice === defaultOption) {
+    const next = !config.defaultEnabled;
+    saveConfig({ defaultEnabled: next });
+    ctx.ui.notify(`Default shield is now ${next ? "ON" : "OFF"}`, "info");
+  }
+}
+
 export default function (pi: ExtensionAPI) {
 
   registerDeleteProtection(pi);
@@ -106,6 +157,8 @@ export default function (pi: ExtensionAPI) {
   registerPrivilegeProtection(pi);
 
   pi.on("session_start", async (_event, ctx) => {
+    const config = loadConfig();
+    state.protectionEnabled = config.defaultEnabled;
     installProtectionEditor(ctx);
   });
 
@@ -117,21 +170,36 @@ export default function (pi: ExtensionAPI) {
   pi.registerCommand("shield", {
     description: "Toggle file protection shield on/off",
     getArgumentCompletions(prefix: string) {
-      return [{ value: "on", label: "on - Enable protection" }, { value: "off", label: "off - Disable protection" }]
-        .filter((i) => i.value.startsWith(prefix));
+      return [
+        { value: "on", label: "on - Enable shield for current session" },
+        { value: "off", label: "off - Disable shield for current session" },
+        { value: "default on", label: "default on - Enable shield by default" },
+        { value: "default off", label: "default off - Disable shield by default" },
+      ].filter((i) => i.value.startsWith(prefix));
     },
     handler: async (args, ctx) => {
-      if (args === "on") {
-        state.protectionEnabled = true;
-        activeProtectionEditor?.refresh();
-        ctx.ui.notify("🛡️ Protection enabled", "info");
-      } else if (args === "off") {
-        state.protectionEnabled = false;
-        activeProtectionEditor?.refresh();
-        ctx.ui.notify("⚠️ Protection disabled", "info");
+      const normalized = args.trim().toLowerCase();
+      const parts = normalized.split(/\s+/).filter(Boolean);
+
+      if (parts.length === 0) {
+        await openShieldPanel(ctx);
+      } else if (normalized === "on") {
+        setShieldEnabled(true);
+        ctx.ui.notify("🛡️ Shield enabled", "info");
+      } else if (normalized === "off") {
+        setShieldEnabled(false);
+        ctx.ui.notify("⚠️ Shield disabled", "info");
+      } else if (normalized === "default on") {
+        saveConfig({ defaultEnabled: true });
+        ctx.ui.notify("🛡️ Default shield is now ON", "info");
+      } else if (normalized === "default off") {
+        saveConfig({ defaultEnabled: false });
+        ctx.ui.notify("⚠️ Default shield is now OFF", "info");
       } else {
-        const status = state.protectionEnabled ? "🛡️ ON" : "⚠️ OFF";
-        ctx.ui.notify(`Shield is currently ${status}. Usage: /shield on | /shield off`, "info");
+        const config = loadConfig();
+        const currentStatus = state.protectionEnabled ? "🛡️ ON" : "⚠️ OFF";
+        const defaultStatus = config.defaultEnabled ? "🛡️ ON" : "⚠️ OFF";
+        ctx.ui.notify(`Current: ${currentStatus}. Default: ${defaultStatus}. Usage: /shield, /shield on|off, /shield default on|off`, "info");
       }
     },
   });
