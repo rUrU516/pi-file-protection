@@ -206,6 +206,14 @@ export default function (pi: ExtensionAPI) {
     activeProtectionEditor = undefined;
   });
 
+  pi.registerShortcut("ctrl+shift+s", {
+    description: "Toggle shield for current session",
+    handler: async (ctx) => {
+      setShieldEnabled(!state.protectionEnabled);
+      ctx.ui.notify(`Shield ${state.protectionEnabled ? "enabled" : "disabled"} for current session`, "info");
+    },
+  });
+
   pi.registerCommand("shield", {
     description: "Toggle file protection shield on/off",
     getArgumentCompletions(prefix: string) {
