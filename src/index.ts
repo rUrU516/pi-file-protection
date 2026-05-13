@@ -6,9 +6,47 @@ import { registerPrivilegeProtection } from "./privilege-protection";
 import { state } from "./constants";
 import { osNotify } from "./os-notify";
 
-function updateStatus(ctx: { ui: { setWidget: (key: string, lines: string[]) => void } }) {
-  const icon = state.protectionEnabled ? "🛡️" : "🔥";
-  ctx.ui.setWidget("protection", [icon]);
+// Animation frames
+const SHIELD_FRAMES = [
+  "  ✨  🛡️  ✨  ",
+  "  ✨ 🛡️✨  ",
+  "   🛡️✨   ",
+  "   ✨🛡️   ",
+  "  ✨ 🛡️ ✨  ",
+  "  ✨  🛡️  ✨  ",
+];
+
+const FIRE_FRAMES = [
+  "  🔥  🔥  🔥  ",
+  "   🔥🔥🔥   ",
+  "  💥 🔥 💥  ",
+  "   🔥 🔥 🔥  ",
+  "  🔥💥🔥  ",
+  "   🔥🔥  🔥  ",
+];
+
+let animInterval: ReturnType<typeof setInterval> | null = null;
+let frameIndex = 0;
+
+function startAnimation(ctx: { ui: { setWidget: (key: string, lines: string[]) => void } }) {
+  stopAnimation();
+  frameIndex = 0;
+
+  const render = () => {
+    const frames = state.protectionEnabled ? SHIELD_FRAMES : FIRE_FRAMES;
+    ctx.ui.setWidget("protection", [frames[frameIndex % frames.length]]);
+    frameIndex++;
+  };
+
+  render();
+  animInterval = setInterval(render, 600);
+}
+
+function stopAnimation() {
+  if (animInterval !== null) {
+    clearInterval(animInterval);
+    animInterval = null;
+  }
 }
 
 export default function (pi: ExtensionAPI) {
@@ -19,7 +57,11 @@ export default function (pi: ExtensionAPI) {
   registerPrivilegeProtection(pi);
 
   pi.on("session_start", async (_event, ctx) => {
-    updateStatus(ctx);
+    startAnimation(ctx);
+  });
+
+  pi.on("session_shutdown", async () => {
+    stopAnimation();
   });
 
   pi.registerCommand("protect", {
@@ -31,11 +73,11 @@ export default function (pi: ExtensionAPI) {
     handler: async (args, ctx) => {
       if (args === "on") {
         state.protectionEnabled = true;
-        updateStatus(ctx);
+        startAnimation(ctx);
         ctx.ui.notify("🛡️ Protection enabled", "info");
       } else if (args === "off") {
         state.protectionEnabled = false;
-        updateStatus(ctx);
+        startAnimation(ctx);
         ctx.ui.notify("⚠️ Protection disabled", "info");
       } else {
         const status = state.protectionEnabled ? "🛡️ ON" : "⚠️ OFF";
