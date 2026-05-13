@@ -81,7 +81,7 @@ function setNotificationEnabled(enabled: boolean): void {
 
 function renderStatusLabel(frame: number): string {
   const colors = state.protectionEnabled ? SHIELD_COLORS : FIRE_COLORS;
-  const text = state.protectionEnabled ? "[ shield on  ]" : "[ shield off ]";
+  const text = state.protectionEnabled ? "[ 🛡   shield on  ]" : "[ 🛡💥 shield off ]";
   const color = colors[frame % colors.length];
   return `${rgbFg(color[0], color[1], color[2])}${text}${RESET}`;
 }
