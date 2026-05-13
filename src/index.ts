@@ -4,6 +4,7 @@ import { registerEditProtection } from "./edit-protection";
 import { registerGitProtection } from "./git-protection";
 import { registerPrivilegeProtection } from "./privilege-protection";
 import { state } from "./constants";
+import { osNotify } from "./os-notify";
 
 export default function (pi: ExtensionAPI) {
 
@@ -30,6 +31,12 @@ export default function (pi: ExtensionAPI) {
         ctx.ui.notify(`Protection is currently ${status}. Usage: /protect on | /protect off`, "info");
       }
     },
+  });
+
+  pi.on("agent_end", async (_event, _ctx) => {
+    if (!state.protectionEnabled) {
+      osNotify("⚠️ Protection Disabled", "File protection is OFF. Run /protect on to re-enable.");
+    }
   });
 
 }
