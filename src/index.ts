@@ -12,39 +12,29 @@ function rgbFg(r: number, g: number, b: number): string {
   return `\x1b[38;2;${r};${g};${b}m`;
 }
 
-// Shield gradient: icy blue/cyan/violet tones
+// Shield gradient: icy blue tones
 const SHIELD_COLORS = [
+  [56, 189, 248],   // sky-400
+  [14, 165, 233],   // sky-500
+  [2, 132, 199],    // sky-600
+  [56, 189, 248],   // sky-400
   [125, 211, 252],  // sky-300
   [56, 189, 248],   // sky-400
-  [34, 211, 238],   // cyan-400
-  [45, 212, 191],   // teal-400
-  [14, 165, 233],   // sky-500
-  [59, 130, 246],   // blue-500
-  [99, 102, 241],   // indigo-500
-  [139, 92, 246],   // violet-500
-  [56, 189, 248],   // sky-400
 ];
 
-// Fire gradient: warm red/orange/yellow/magenta tones
+// Fire gradient: warm red/orange/yellow tones
 const FIRE_COLORS = [
-  [220, 38, 38],    // red-600
   [239, 68, 68],    // red-500
   [249, 115, 22],   // orange-500
-  [251, 146, 60],   // orange-400
   [234, 179, 8],    // yellow-500
-  [250, 204, 21],   // yellow-400
   [249, 115, 22],   // orange-500
-  [236, 72, 153],   // pink-500
+  [239, 68, 68],    // red-500
   [220, 38, 38],    // red-600
 ];
 
-function renderStatusLabel(colors: number[][], text: string, offset: number): string {
-  let out = "";
-  for (let i = 0; i < text.length; i++) {
-    const color = colors[(i + offset) % colors.length];
-    out += `${rgbFg(color[0], color[1], color[2])}${text[i]}`;
-  }
-  return out + RESET;
+function renderStatusLabel(colors: number[][], text: string): string {
+  const midColor = colors[Math.floor(colors.length / 2)];
+  return `${rgbFg(midColor[0], midColor[1], midColor[2])}${text}${RESET}`;
 }
 
 let animInterval: ReturnType<typeof setInterval> | null = null;
@@ -62,13 +52,13 @@ function startAnimation(ctx: { ui: { setWidget: (key: string, lines: string[]) =
     // Animate by shifting color array
     const shifted = [...colors.slice(frameIndex % colors.length), ...colors.slice(0, frameIndex % colors.length)];
 
-    const widget = renderStatusLabel(shifted, label, frameIndex);
+    const widget = renderStatusLabel(shifted, label);
     ctx.ui.setWidget("protection", [widget]);
     frameIndex++;
   };
 
   render();
-  animInterval = setInterval(render, 80);
+  animInterval = setInterval(render, 150);
 }
 
 function stopAnimation() {
