@@ -114,8 +114,8 @@ export default function (pi: ExtensionAPI) {
     activeProtectionEditor = undefined;
   });
 
-  pi.registerCommand("protect", {
-    description: "Toggle file protection on/off",
+  pi.registerCommand("shield", {
+    description: "Toggle file protection shield on/off",
     getArgumentCompletions(prefix: string) {
       return [{ value: "on", label: "on - Enable protection" }, { value: "off", label: "off - Disable protection" }]
         .filter((i) => i.value.startsWith(prefix));
@@ -131,7 +131,7 @@ export default function (pi: ExtensionAPI) {
         ctx.ui.notify("⚠️ Protection disabled", "info");
       } else {
         const status = state.protectionEnabled ? "🛡️ ON" : "⚠️ OFF";
-        ctx.ui.notify(`Protection is currently ${status}. Usage: /protect on | /protect off`, "info");
+        ctx.ui.notify(`Shield is currently ${status}. Usage: /shield on | /shield off`, "info");
       }
     },
   });
