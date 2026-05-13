@@ -79,13 +79,12 @@ function startAnimation(ctx: { ui: { setWidget: (key: string, lines: string[]) =
   const render = () => {
     const isOn = state.protectionEnabled;
     const colors = isOn ? SHIELD_COLORS : FIRE_COLORS;
-    const icon = isOn ? "\u{1F6E1}" : "🔥";
-    const label = isOn ? " SHIELD  ON " : " SHIELD OFF ";
+    const label = isOn ? "[ PROTECT ON  ]" : "[ PROTECT OFF ]";
 
     // Animate by shifting color array
     const shifted = [...colors.slice(frameIndex % colors.length), ...colors.slice(0, frameIndex % colors.length)];
 
-    const bar = renderGradientBar(shifted, 4, `${icon} ${label}`);
+    const bar = renderGradientBar(shifted, 4, label);
     ctx.ui.setWidget("protection", [bar]);
     frameIndex++;
   };
