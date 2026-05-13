@@ -16,11 +16,14 @@ pi install npm:pi-shield
 /shield off
 /shield default on
 /shield default off
+/shield notifications on
+/shield notifications off
 ```
 
 - `/shield` opens the settings panel.
 - `/shield on/off` changes the current session only.
 - `/shield default on/off` changes the default for future sessions.
+- `/shield notifications on/off` toggles macOS notifications globally.
 
 ## Shortcut
 
@@ -46,7 +49,7 @@ Shield status is shown in the editor border:
 [ SHIELD OFF ]
 ```
 
-macOS notifications are shown for permission requests and agent completion.
+macOS notifications are shown for permission requests and agent completion. They can be disabled from `/shield` or with `/shield notifications off`.
 
 ## Config
 

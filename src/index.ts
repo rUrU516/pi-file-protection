@@ -12,10 +12,11 @@ import { osNotify } from "./os-notify";
 
 type ShieldConfig = {
   defaultEnabled: boolean;
+  notificationEnabled: boolean;
 };
 
 const CONFIG_PATH = join(homedir(), ".pi", "agent", "pi-shield.json");
-const DEFAULT_CONFIG: ShieldConfig = { defaultEnabled: true };
+const DEFAULT_CONFIG: ShieldConfig = { defaultEnabled: true, notificationEnabled: true };
 
 // ANSI colors
 const RESET = "\x1b[0m";
@@ -55,7 +56,10 @@ function loadConfig(): ShieldConfig {
   try {
     if (!existsSync(CONFIG_PATH)) return DEFAULT_CONFIG;
     const parsed = JSON.parse(readFileSync(CONFIG_PATH, "utf8")) as Partial<ShieldConfig>;
-    return { defaultEnabled: parsed.defaultEnabled ?? DEFAULT_CONFIG.defaultEnabled };
+    return {
+      defaultEnabled: parsed.defaultEnabled ?? DEFAULT_CONFIG.defaultEnabled,
+      notificationEnabled: parsed.notificationEnabled ?? DEFAULT_CONFIG.notificationEnabled,
+    };
   } catch {
     return DEFAULT_CONFIG;
   }
@@ -69,6 +73,10 @@ function saveConfig(config: ShieldConfig): void {
 function setShieldEnabled(enabled: boolean): void {
   state.protectionEnabled = enabled;
   activeProtectionEditor?.refresh();
+}
+
+function setNotificationEnabled(enabled: boolean): void {
+  state.notificationEnabled = enabled;
 }
 
 function renderStatusLabel(frame: number): string {
@@ -144,6 +152,12 @@ async function openShieldPanel(ctx: any): Promise<void> {
         currentValue: config.defaultEnabled ? "ON" : "OFF",
         values: ["ON", "OFF"],
       },
+      {
+        id: "notifications",
+        label: "Notifications",
+        currentValue: state.notificationEnabled ? "ON" : "OFF",
+        values: ["ON", "OFF"],
+      },
     ];
 
     const container = new Container();
@@ -158,14 +172,17 @@ async function openShieldPanel(ctx: any): Promise<void> {
 
     const settingsList = new SettingsList(
       items,
-      4,
+      5,
       getSettingsListTheme(),
       (id, newValue) => {
         const enabled = newValue === "ON";
         if (id === "current") {
           setShieldEnabled(enabled);
         } else if (id === "default") {
-          saveConfig({ defaultEnabled: enabled });
+          saveConfig({ ...loadConfig(), defaultEnabled: enabled });
+        } else if (id === "notifications") {
+          setNotificationEnabled(enabled);
+          saveConfig({ ...loadConfig(), notificationEnabled: enabled });
         }
       },
       () => done(undefined),
@@ -198,6 +215,7 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_start", async (_event, ctx) => {
     const config = loadConfig();
     state.protectionEnabled = config.defaultEnabled;
+    state.notificationEnabled = config.notificationEnabled;
     installProtectionEditor(ctx);
   });
 
@@ -222,6 +240,8 @@ export default function (pi: ExtensionAPI) {
         { value: "off", label: "off - Disable shield for current session" },
         { value: "default on", label: "default on - Enable shield by default" },
         { value: "default off", label: "default off - Disable shield by default" },
+        { value: "notifications on", label: "notifications on - Enable OS notifications" },
+        { value: "notifications off", label: "notifications off - Disable OS notifications" },
       ].filter((i) => i.value.startsWith(prefix));
     },
     handler: async (args, ctx) => {
@@ -237,16 +257,25 @@ export default function (pi: ExtensionAPI) {
         setShieldEnabled(false);
         ctx.ui.notify("⚠️ Shield disabled", "info");
       } else if (normalized === "default on") {
-        saveConfig({ defaultEnabled: true });
+        saveConfig({ ...loadConfig(), defaultEnabled: true });
         ctx.ui.notify("🛡️ Default shield is now ON", "info");
       } else if (normalized === "default off") {
-        saveConfig({ defaultEnabled: false });
+        saveConfig({ ...loadConfig(), defaultEnabled: false });
         ctx.ui.notify("⚠️ Default shield is now OFF", "info");
+      } else if (normalized === "notifications on") {
+        setNotificationEnabled(true);
+        saveConfig({ ...loadConfig(), notificationEnabled: true });
+        ctx.ui.notify("🔔 Notifications enabled", "info");
+      } else if (normalized === "notifications off") {
+        setNotificationEnabled(false);
+        saveConfig({ ...loadConfig(), notificationEnabled: false });
+        ctx.ui.notify("🔕 Notifications disabled", "info");
       } else {
         const config = loadConfig();
         const currentStatus = state.protectionEnabled ? "🛡️ ON" : "⚠️ OFF";
         const defaultStatus = config.defaultEnabled ? "🛡️ ON" : "⚠️ OFF";
-        ctx.ui.notify(`Current: ${currentStatus}. Default: ${defaultStatus}. Usage: /shield, /shield on|off, /shield default on|off`, "info");
+        const notificationStatus = state.notificationEnabled ? "🔔 ON" : "🔕 OFF";
+        ctx.ui.notify(`Current: ${currentStatus}. Default: ${defaultStatus}. Notifications: ${notificationStatus}. Usage: /shield, /shield on|off, /shield default on|off, /shield notifications on|off`, "info");
       }
     },
   });

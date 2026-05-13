@@ -1,8 +1,11 @@
 import { execSync } from "node:child_process";
+import { state } from "./constants";
 
 const MAX_LENGTH = 100;
 
 export function osNotify(title: string, message: string) {
+  if (!state.notificationEnabled) return;
+
   try {
     const truncated = message.length > MAX_LENGTH ? message.slice(0, MAX_LENGTH) + "…" : message;
     execSync(`osascript -e 'display notification "${escape(truncated)}" with title "${escape(title)}" sound name "default"'`);
