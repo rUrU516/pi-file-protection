@@ -1,11 +1,12 @@
 {
-  "name": "pi-file-protection",
-  "version": "3.0.0",
-  "description": "Pi extension that confirms before delete/edit operations - protects files from accidental changes",
+  "name": "pi-shield",
+  "version": "1.0.0",
+  "description": "Pi extension that shields your files and system from accidental destructive operations",
   "keywords": [
     "pi-package",
-    "file-protection",
-    "security"
+    "shield",
+    "security",
+    "permission-gate"
   ],
   "type": "module",
   "main": "./src/index.ts",
@@ -23,6 +24,6 @@
   "author": "Zhuoru <zhuoruli0516@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rUrU516/pi-file-protection.git"
+    "url": "git+https://github.com/rUrU516/pi-shield.git"
   }
 }

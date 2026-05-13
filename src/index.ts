@@ -14,7 +14,7 @@ type ShieldConfig = {
   defaultEnabled: boolean;
 };
 
-const CONFIG_PATH = join(homedir(), ".pi", "agent", "pi-file-protection.json");
+const CONFIG_PATH = join(homedir(), ".pi", "agent", "pi-shield.json");
 const DEFAULT_CONFIG: ShieldConfig = { defaultEnabled: true };
 
 // ANSI colors
