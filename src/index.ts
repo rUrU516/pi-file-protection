@@ -55,7 +55,7 @@ export default function (pi: ExtensionAPI) {
       summary = summary.slice(0, MAX_LENGTH) + "…";
     }
 
-    osNotify("π", summary || "Done.");
+    osNotify("π", summary || "⚠️ No response text");
   });
 
 }
