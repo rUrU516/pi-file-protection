@@ -132,11 +132,8 @@ async function openShieldPanel(ctx: any): Promise<void> {
   const config = loadConfig();
   const currentStatus = state.protectionEnabled ? "ON" : "OFF";
   const defaultStatus = config.defaultEnabled ? "ON" : "OFF";
-  const currentNext = state.protectionEnabled ? "OFF" : "ON";
-  const defaultNext = config.defaultEnabled ? "OFF" : "ON";
-
-  const currentOption = `Current session: ${currentStatus} → ${currentNext}`;
-  const defaultOption = `Default for future sessions: ${defaultStatus} → ${defaultNext}`;
+  const currentOption = `Current session: ${currentStatus}`;
+  const defaultOption = `Default for future sessions: ${defaultStatus}`;
 
   const choice = await ctx.ui.select("Shield settings", [currentOption, defaultOption]);
   if (choice === currentOption) {
