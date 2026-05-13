@@ -13,6 +13,28 @@ A Pi extension that protects your files and system from accidental destructive o
 
 ## Features / 功能
 
+### 🔄 Session Toggle / 会话开关 (`/protect`)
+
+Use the `/protect` command to toggle protection on or off within the current session (default: **ON**).
+
+使用 `/protect` 命令在当前会话中切换保护状态（默认：**开启**）。
+
+```
+/protect on    # Enable protection / 开启保护
+/protect off   # Disable protection / 关闭保护
+/protect       # Show current status / 显示当前状态
+```
+
+### 📢 OS Notifications / 系统通知
+
+- **Permission requests** — macOS notification pops up when a protected operation needs your approval (✏️ for file edits, 📟 for bash commands)
+- **Agent completion** — macOS notification with a summary of the last response when the agent finishes
+- **Protection status** — notification content includes the specific operation details (file path, command, etc.)
+
+- **权限请求** — 受保护操作需要确认时弹出 macOS 系统通知（✏️ 表示文件编辑，📟 表示 bash 命令）
+- **Agent 完成** — agent 回复完毕后弹出 macOS 系统通知，附带回复摘要
+- **保护状态** — 通知内容包含具体操作详情（文件路径、命令等）
+
 ### Git & GitHub CLI Protection / Git 与 GitHub CLI 保护
 Prompts for confirmation before executing blacklisted `git` commands, and before executing any `gh` commands.
 执行黑名单中的 `git` 命令前会要求确认，并且执行任何 `gh` 命令前也会要求确认。
