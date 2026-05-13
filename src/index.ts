@@ -8,12 +8,8 @@ import { osNotify } from "./os-notify";
 
 // ANSI colors
 const RESET = "\x1b[0m";
-const RESET_FG = "\x1b[39m";
 function rgbFg(r: number, g: number, b: number): string {
   return `\x1b[38;2;${r};${g};${b}m`;
-}
-function rgbBg(r: number, g: number, b: number): string {
-  return `\x1b[48;2;${r};${g};${b}m`;
 }
 
 // Shield gradient: icy blue tones
@@ -36,37 +32,9 @@ const FIRE_COLORS = [
   [220, 38, 38],    // red-600
 ];
 
-const BLOCK = "▌";
-const THIN_BLOCK = "▎";
-
-function renderGradientBar(colors: number[][], width: number, text: string): string {
-  let bar = "";
-  // Left gradient blocks
-  for (let i = 0; i < width; i++) {
-    const t = width === 1 ? 0 : i / (width - 1);
-    const colorIdx = Math.floor(t * (colors.length - 1));
-    const nextIdx = Math.min(colorIdx + 1, colors.length - 1);
-    const localT = (t * (colors.length - 1)) - colorIdx;
-    const r = Math.round(colors[colorIdx][0] + (colors[nextIdx][0] - colors[colorIdx][0]) * localT);
-    const g = Math.round(colors[colorIdx][1] + (colors[nextIdx][1] - colors[colorIdx][1]) * localT);
-    const b = Math.round(colors[colorIdx][2] + (colors[nextIdx][2] - colors[colorIdx][2]) * localT);
-    bar += `${rgbFg(r, g, b)}${BLOCK}`;
-  }
-  // Text in the middle color
+function renderStatusLabel(colors: number[][], text: string): string {
   const midColor = colors[Math.floor(colors.length / 2)];
-  bar += `${RESET_FG} ${rgbFg(midColor[0], midColor[1], midColor[2])}${text}${RESET_FG} `;
-  // Right gradient blocks
-  for (let i = 0; i < width; i++) {
-    const t = width === 1 ? 0 : i / (width - 1);
-    const colorIdx = Math.floor(t * (colors.length - 1));
-    const nextIdx = Math.min(colorIdx + 1, colors.length - 1);
-    const localT = (t * (colors.length - 1)) - colorIdx;
-    const r = Math.round(colors[colorIdx][0] + (colors[nextIdx][0] - colors[colorIdx][0]) * localT);
-    const g = Math.round(colors[colorIdx][1] + (colors[nextIdx][1] - colors[colorIdx][1]) * localT);
-    const b = Math.round(colors[colorIdx][2] + (colors[nextIdx][2] - colors[colorIdx][2]) * localT);
-    bar += `${rgbFg(r, g, b)}${BLOCK}`;
-  }
-  return bar + RESET;
+  return `${rgbFg(midColor[0], midColor[1], midColor[2])}${text}${RESET}`;
 }
 
 let animInterval: ReturnType<typeof setInterval> | null = null;
@@ -84,8 +52,8 @@ function startAnimation(ctx: { ui: { setWidget: (key: string, lines: string[]) =
     // Animate by shifting color array
     const shifted = [...colors.slice(frameIndex % colors.length), ...colors.slice(0, frameIndex % colors.length)];
 
-    const bar = renderGradientBar(shifted, 4, label);
-    ctx.ui.setWidget("protection", [bar]);
+    const widget = renderStatusLabel(shifted, label);
+    ctx.ui.setWidget("protection", [widget]);
     frameIndex++;
   };
 
