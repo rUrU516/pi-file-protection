@@ -6,45 +6,68 @@ import { registerPrivilegeProtection } from "./privilege-protection";
 import { state } from "./constants";
 import { osNotify } from "./os-notify";
 
-// Animation frames - Shield (icy, calm, breathing)
-const SHIELD_FRAMES = [
-  "   ✦  ·  🛡️  ·  ✦   ",
-  "   ✦ ·  🛡️  · ✦   ",
-  "    ✦ · 🛡️ · ✦    ",
-  "    ✦·  🛡️  ·✦    ",
-  "     ✦· 🛡️ ·✦     ",
-  "     ✦ ·🛡️· ✦     ",
-  "    ✦ · 🛡️ · ✦    ",
-  "   ✦ ·  🛡️  · ✦   ",
-  "   ✦ ·  ❄️  · ✦   ",
-  "    ✦ · 🛡️ · ✦    ",
-  "   ❄️  ·  🛡️  ·  ❄️   ",
-  "    ✦ · 🛡️ · ✦    ",
-  "   ✦  ·  🛡️  ·  ✦   ",
-  "    ❄️ · 🛡️ · ❄️    ",
-  "   ✦  ·  🛡️  ·  ✦   ",
-  "  ✦   ·  🛡️  ·   ✦  ",
+// ANSI colors
+const RESET = "\x1b[0m";
+const RESET_FG = "\x1b[39m";
+function rgbFg(r: number, g: number, b: number): string {
+  return `\x1b[38;2;${r};${g};${b}m`;
+}
+function rgbBg(r: number, g: number, b: number): string {
+  return `\x1b[48;2;${r};${g};${b}m`;
+}
+
+// Shield gradient: icy blue tones
+const SHIELD_COLORS = [
+  [56, 189, 248],   // sky-400
+  [14, 165, 233],   // sky-500
+  [2, 132, 199],    // sky-600
+  [56, 189, 248],   // sky-400
+  [125, 211, 252],  // sky-300
+  [56, 189, 248],   // sky-400
 ];
 
-// Animation frames - Fire (wild, chaotic, burning)
-const FIRE_FRAMES = [
-  "   🔥  🔥  🔥   ",
-  "  🔥 🔥🔥 🔥  ",
-  "   💥🔥🔥💥   ",
-  "  🔥 💥🔥💥 🔥  ",
-  "   🔥🔥💥🔥🔥   ",
-  "  💥 🔥🔥🔥 💥  ",
-  "  🔥🔥 💥 🔥🔥  ",
-  "   💥🔥🔥🔥💥   ",
-  "  🔥 💥🔥💥 🔥  ",
-  "   🔥💥  💥🔥   ",
-  "  🔥🔥 💥🔥🔥  ",
-  "   💥  🔥  💥   ",
-  "  🔥💥🔥🔥💥🔥  ",
-  "   🔥💥  💥🔥   ",
-  "  💥🔥 💥 🔥💥  ",
-  "   🔥🔥💥🔥🔥   ",
+// Fire gradient: warm red/orange/yellow tones
+const FIRE_COLORS = [
+  [239, 68, 68],    // red-500
+  [249, 115, 22],   // orange-500
+  [234, 179, 8],    // yellow-500
+  [249, 115, 22],   // orange-500
+  [239, 68, 68],    // red-500
+  [220, 38, 38],    // red-600
 ];
+
+const BLOCK = "▌";
+const THIN_BLOCK = "▎";
+
+function renderGradientBar(colors: number[][], width: number, text: string): string {
+  let bar = "";
+  // Left gradient blocks
+  for (let i = 0; i < width; i++) {
+    const t = width === 1 ? 0 : i / (width - 1);
+    const colorIdx = Math.floor(t * (colors.length - 1));
+    const nextIdx = Math.min(colorIdx + 1, colors.length - 1);
+    const localT = (t * (colors.length - 1)) - colorIdx;
+    const r = Math.round(colors[colorIdx][0] + (colors[nextIdx][0] - colors[colorIdx][0]) * localT);
+    const g = Math.round(colors[colorIdx][1] + (colors[nextIdx][1] - colors[colorIdx][1]) * localT);
+    const b = Math.round(colors[colorIdx][2] + (colors[nextIdx][2] - colors[colorIdx][2]) * localT);
+    bar += `${rgbFg(r, g, b)}${BLOCK}`;
+  }
+  // Text in the middle color
+  const midColor = colors[Math.floor(colors.length / 2)];
+  bar += `${RESET_FG} ${rgbFg(midColor[0], midColor[1], midColor[2])}${text}${RESET_FG} `;
+  // Right gradient blocks
+  for (let i = 0; i < width; i++) {
+    const t = width === 1 ? 0 : i / (width - 1);
+    const colorIdx = Math.floor(t * (colors.length - 1));
+    const nextIdx = Math.min(colorIdx + 1, colors.length - 1);
+    const localT = (t * (colors.length - 1)) - colorIdx;
+    const r = Math.round(colors[colorIdx][0] + (colors[nextIdx][0] - colors[colorIdx][0]) * localT);
+    const g = Math.round(colors[colorIdx][1] + (colors[nextIdx][1] - colors[colorIdx][1]) * localT);
+    const b = Math.round(colors[colorIdx][2] + (colors[nextIdx][2] - colors[colorIdx][2]) * localT);
+    bar += `${rgbFg(r, g, b)}${BLOCK}`;
+  }
+  return bar + RESET;
+}
 
 let animInterval: ReturnType<typeof setInterval> | null = null;
 let frameIndex = 0;
@@ -54,13 +77,21 @@ function startAnimation(ctx: { ui: { setWidget: (key: string, lines: string[]) =
   frameIndex = 0;
 
   const render = () => {
-    const frames = state.protectionEnabled ? SHIELD_FRAMES : FIRE_FRAMES;
-    ctx.ui.setWidget("protection", [frames[frameIndex % frames.length]]);
+    const isOn = state.protectionEnabled;
+    const colors = isOn ? SHIELD_COLORS : FIRE_COLORS;
+    const icon = isOn ? "🛡️" : "🔥";
+    const label = isOn ? "PROTECTED" : "UNPROTECTED";
+
+    // Animate by shifting color array
+    const shifted = [...colors.slice(frameIndex % colors.length), ...colors.slice(0, frameIndex % colors.length)];
+
+    const bar = renderGradientBar(shifted, 4, `${icon} ${label}`);
+    ctx.ui.setWidget("protection", [bar]);
     frameIndex++;
   };
 
   render();
-  animInterval = setInterval(render, 100);
+  animInterval = setInterval(render, 150);
 }
 
 function stopAnimation() {
