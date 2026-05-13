@@ -45,8 +45,8 @@ Toggles the shield for the current session.
 Shield status is shown in the editor border:
 
 ```text
-[ SHIELD ON  ]
-[ SHIELD OFF ]
+[ shield on  ]
+[ shield off ]
 ```
 
 macOS notifications are shown for permission requests and agent completion. They can be disabled from `/shield` or with `/shield notifications off`.

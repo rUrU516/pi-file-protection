@@ -81,7 +81,7 @@ function setNotificationEnabled(enabled: boolean): void {
 
 function renderStatusLabel(frame: number): string {
   const colors = state.protectionEnabled ? SHIELD_COLORS : FIRE_COLORS;
-  const text = state.protectionEnabled ? "[ SHIELD ON  ]" : "[ SHIELD OFF ]";
+  const text = state.protectionEnabled ? "[ shield on  ]" : "[ shield off ]";
   const color = colors[frame % colors.length];
   return `${rgbFg(color[0], color[1], color[2])}${text}${RESET}`;
 }
@@ -143,20 +143,20 @@ async function openShieldPanel(ctx: any): Promise<void> {
       {
         id: "current",
         label: "Current session",
-        currentValue: state.protectionEnabled ? "ON" : "OFF",
-        values: ["ON", "OFF"],
+        currentValue: state.protectionEnabled ? "on" : "off",
+        values: ["on", "off"],
       },
       {
         id: "default",
         label: "Default for future sessions",
-        currentValue: config.defaultEnabled ? "ON" : "OFF",
-        values: ["ON", "OFF"],
+        currentValue: config.defaultEnabled ? "on" : "off",
+        values: ["on", "off"],
       },
       {
         id: "notifications",
         label: "Notifications",
-        currentValue: state.notificationEnabled ? "ON" : "OFF",
-        values: ["ON", "OFF"],
+        currentValue: state.notificationEnabled ? "on" : "off",
+        values: ["on", "off"],
       },
     ];
 
@@ -175,7 +175,7 @@ async function openShieldPanel(ctx: any): Promise<void> {
       5,
       getSettingsListTheme(),
       (id, newValue) => {
-        const enabled = newValue === "ON";
+        const enabled = newValue === "on";
         if (id === "current") {
           setShieldEnabled(enabled);
         } else if (id === "default") {
@@ -258,10 +258,10 @@ export default function (pi: ExtensionAPI) {
         ctx.ui.notify("⚠️ Shield disabled", "info");
       } else if (normalized === "default on") {
         saveConfig({ ...loadConfig(), defaultEnabled: true });
-        ctx.ui.notify("🛡️ Default shield is now ON", "info");
+        ctx.ui.notify("🛡️ Default shield is now on", "info");
       } else if (normalized === "default off") {
         saveConfig({ ...loadConfig(), defaultEnabled: false });
-        ctx.ui.notify("⚠️ Default shield is now OFF", "info");
+        ctx.ui.notify("⚠️ Default shield is now off", "info");
       } else if (normalized === "notifications on") {
         setNotificationEnabled(true);
         saveConfig({ ...loadConfig(), notificationEnabled: true });
@@ -272,9 +272,9 @@ export default function (pi: ExtensionAPI) {
         ctx.ui.notify("🔕 Notifications disabled", "info");
       } else {
         const config = loadConfig();
-        const currentStatus = state.protectionEnabled ? "🛡️ ON" : "⚠️ OFF";
-        const defaultStatus = config.defaultEnabled ? "🛡️ ON" : "⚠️ OFF";
-        const notificationStatus = state.notificationEnabled ? "🔔 ON" : "🔕 OFF";
+        const currentStatus = state.protectionEnabled ? "🛡️ on" : "⚠️ off";
+        const defaultStatus = config.defaultEnabled ? "🛡️ on" : "⚠️ off";
+        const notificationStatus = state.notificationEnabled ? "🔔 on" : "🔕 off";
         ctx.ui.notify(`Current: ${currentStatus}. Default: ${defaultStatus}. Notifications: ${notificationStatus}. Usage: /shield, /shield on|off, /shield default on|off, /shield notifications on|off`, "info");
       }
     },
