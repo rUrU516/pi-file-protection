@@ -1,6 +1,6 @@
 {
   "name": "pi-file-protection",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Pi extension that confirms before delete/edit operations - protects files from accidental changes",
   "keywords": [
     "pi-package",
@@ -23,6 +23,6 @@
   "author": "Zhuoru <zhuoruli0516@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rUrU516/pi-file-protection.git"
+    "url": "git+https://github.com/rUrU516/pi-file-protection.git"
   }
 }

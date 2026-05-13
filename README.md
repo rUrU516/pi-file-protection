@@ -13,27 +13,72 @@ A Pi extension that protects your files and system from accidental destructive o
 
 ## Features / 功能
 
-### 🔄 Session Toggle / 会话开关 (`/protect`)
+### 🛡️ Shield Control / 保护盾控制 (`/shield`)
 
-Use the `/protect` command to toggle protection on or off within the current session (default: **ON**).
+Use the `/shield` command to toggle protection for the current session or configure the default state for future sessions.
 
-使用 `/protect` 命令在当前会话中切换保护状态（默认：**开启**）。
+使用 `/shield` 命令切换当前会话的保护状态，或配置未来会话的默认状态。
 
+```bash
+/shield                 # Open interactive shield settings panel / 打开交互式设置面板
+/shield on              # Enable shield for current session / 当前会话开启保护
+/shield off             # Disable shield for current session / 当前会话关闭保护
+/shield default on      # Enable shield by default / 默认开启保护
+/shield default off     # Disable shield by default / 默认关闭保护
 ```
-/protect on    # Enable protection / 开启保护
-/protect off   # Disable protection / 关闭保护
-/protect       # Show current status / 显示当前状态
+
+The interactive panel supports toggling:
+
+交互式面板支持切换：
+
+- Current session shield state / 当前会话保护状态
+- Default shield state for future sessions / 未来会话默认保护状态
+
+Default configuration is stored at:
+
+默认配置保存于：
+
+```text
+~/.pi/agent/pi-file-protection.json
 ```
+
+### ⌨️ Shortcut / 快捷键
+
+```text
+Ctrl+Shift+S
+```
+
+Toggle the shield for the current session without changing the default configuration.
+
+切换当前会话的保护状态，不影响默认配置。
+
+### 🎨 Editor Status / 输入框状态显示
+
+The shield state is shown directly in the editor border:
+
+保护状态会直接显示在输入框边框上：
+
+```text
+[ SHIELD ON  ]
+[ SHIELD OFF ]
+```
+
+The status label uses a subtle animated color effect:
+
+状态标签带有轻微的颜色动效：
+
+- `SHIELD ON` — restrained blue tones / 蓝色系
+- `SHIELD OFF` — restrained red tones / 红色系
 
 ### 📢 OS Notifications / 系统通知
 
 - **Permission requests** — macOS notification pops up when a protected operation needs your approval (✏️ for file edits, 📟 for bash commands)
 - **Agent completion** — macOS notification with a summary of the last response when the agent finishes
-- **Protection status** — notification content includes the specific operation details (file path, command, etc.)
+- **Operation details** — notification content includes file paths, commands, and other request details
 
 - **权限请求** — 受保护操作需要确认时弹出 macOS 系统通知（✏️ 表示文件编辑，📟 表示 bash 命令）
 - **Agent 完成** — agent 回复完毕后弹出 macOS 系统通知，附带回复摘要
-- **保护状态** — 通知内容包含具体操作详情（文件路径、命令等）
+- **操作详情** — 通知内容包含文件路径、命令等请求信息
 
 ### Git & GitHub CLI Protection / Git 与 GitHub CLI 保护
 Prompts for confirmation before executing blacklisted `git` commands, and before executing any `gh` commands.
