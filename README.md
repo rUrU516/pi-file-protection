@@ -8,6 +8,21 @@ A Pi extension that asks for confirmation before risky file, git, bash, and priv
 pi install npm:pi-shield
 ```
 
+## UI
+
+Shield status lives in the editor border.
+
+<table>
+<tr>
+<td><img src="./assets/shield-on.jpg" alt="shield on" width="420" /></td>
+<td><img src="./assets/shield-off.jpg" alt="shield off" width="420" /></td>
+</tr>
+</table>
+
+Settings panel:
+
+<img src="./assets/shield-settings.jpg" alt="shield settings" width="840" />
+
 ## Commands
 
 ```bash
@@ -33,27 +48,24 @@ Ctrl+Shift+S
 
 Toggles the shield for the current session.
 
-## What it protects
+## Protects
 
 - `write` and `edit` tool calls
 - destructive bash commands like `rm`, `mv`, `delete`
 - risky git / GitHub CLI commands
 - privilege commands like `sudo` and `chmod 777`
 
-## UI
+## Notifications
 
-Shield status is shown in the editor border:
+macOS notifications are shown for permission requests and agent completion.
 
-```text
-[ shield on  ]
-[ shield off ]
+They can be disabled from `/shield` or with:
+
+```bash
+/shield notifications off
 ```
 
-macOS notifications are shown for permission requests and agent completion. They can be disabled from `/shield` or with `/shield notifications off`.
-
 ## Config
-
-Default shield state is stored at:
 
 ```text
 ~/.pi/agent/pi-shield.json
