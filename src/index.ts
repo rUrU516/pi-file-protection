@@ -6,12 +6,20 @@ import { registerPrivilegeProtection } from "./privilege-protection";
 import { state } from "./constants";
 import { osNotify } from "./os-notify";
 
+function updateStatus(ctx: { ui: { setStatus: (key: string, value: string) => void } }) {
+  ctx.ui.setStatus("protection", state.protectionEnabled ? "🛡️" : "🔥");
+}
+
 export default function (pi: ExtensionAPI) {
 
   registerDeleteProtection(pi);
   registerEditProtection(pi);
   registerGitProtection(pi);
   registerPrivilegeProtection(pi);
+
+  pi.on("session_start", async (_event, ctx) => {
+    updateStatus(ctx);
+  });
 
   pi.registerCommand("protect", {
     description: "Toggle file protection on/off",
@@ -22,9 +30,11 @@ export default function (pi: ExtensionAPI) {
     handler: async (args, ctx) => {
       if (args === "on") {
         state.protectionEnabled = true;
+        updateStatus(ctx);
         ctx.ui.notify("🛡️ Protection enabled", "info");
       } else if (args === "off") {
         state.protectionEnabled = false;
+        updateStatus(ctx);
         ctx.ui.notify("⚠️ Protection disabled", "info");
       } else {
         const status = state.protectionEnabled ? "🛡️ ON" : "⚠️ OFF";
