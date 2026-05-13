@@ -58,11 +58,7 @@ class ProtectionEditor extends CustomEditor {
     const last = lines.length - 1;
 
     if (width > labelWidth + 4) {
-      const line = lines[last]!;
-      const corner = line[0] ?? "";
-      const rest = line.slice(corner.length);
-      const prefix = corner + label;
-      lines[last] = prefix + truncateToWidth(rest, width - visibleWidth(prefix), "");
+      lines[last] = label + truncateToWidth(lines[last]!, width - labelWidth, "");
     }
 
     return lines;
