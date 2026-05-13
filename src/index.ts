@@ -6,9 +6,8 @@ import { registerPrivilegeProtection } from "./privilege-protection";
 import { state } from "./constants";
 import { osNotify } from "./os-notify";
 
-function updateStatus(ctx: { ui: { setStatus: (key: string, value: string) => void; setWidget: (key: string, lines: string[]) => void } }) {
+function updateStatus(ctx: { ui: { setWidget: (key: string, lines: string[]) => void } }) {
   const icon = state.protectionEnabled ? "🛡️" : "🔥";
-  ctx.ui.setStatus("protection", icon);
   ctx.ui.setWidget("protection", [icon]);
 }
 
