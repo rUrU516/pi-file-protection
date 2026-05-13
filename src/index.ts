@@ -164,7 +164,7 @@ async function openShieldPanel(ctx: any): Promise<void> {
     container.addChild(
       new (class {
         render(_width: number) {
-          return [theme.fg("accent", theme.bold("Pi Shield")), ""];
+          return [theme.fg("accent", theme.bold("🛡 Pi Shield")), ""];
         }
         invalidate() {}
       })(),
