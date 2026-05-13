@@ -38,13 +38,9 @@ const FIRE_COLORS = [
   [220, 38, 38],    // red-600
 ];
 
-function renderStatusLabel(colors: number[][], text: string, offset: number): string {
-  let out = "";
-  for (let i = 0; i < text.length; i++) {
-    const color = colors[(i + offset) % colors.length];
-    out += `${rgbFg(color[0], color[1], color[2])}${text[i]}`;
-  }
-  return out + RESET;
+function renderStatusLabel(colors: number[][], text: string): string {
+  const color = colors[0];
+  return `${rgbFg(color[0], color[1], color[2])}${text}${RESET}`;
 }
 
 let animInterval: ReturnType<typeof setInterval> | null = null;
@@ -62,7 +58,7 @@ function startAnimation(ctx: { ui: { setWidget: (key: string, lines: string[]) =
     // Animate by shifting color array
     const shifted = [...colors.slice(frameIndex % colors.length), ...colors.slice(0, frameIndex % colors.length)];
 
-    const widget = renderStatusLabel(shifted, label, frameIndex);
+    const widget = renderStatusLabel(shifted, label);
     ctx.ui.setWidget("protection", [widget]);
     frameIndex++;
   };
