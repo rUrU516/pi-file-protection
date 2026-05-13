@@ -23,6 +23,10 @@ Settings panel:
 
 <img src="./assets/shield-settings.jpg" alt="shield settings" width="840" />
 
+Permission confirmation:
+
+<img src="./assets/permission-confirm.jpg" alt="permission confirmation" width="840" />
+
 ## Commands
 
 ```bash
