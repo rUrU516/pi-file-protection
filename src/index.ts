@@ -60,7 +60,7 @@ function startAnimation(ctx: { ui: { setWidget: (key: string, lines: string[]) =
   };
 
   render();
-  animInterval = setInterval(render, 200);
+  animInterval = setInterval(render, 100);
 }
 
 function stopAnimation() {
