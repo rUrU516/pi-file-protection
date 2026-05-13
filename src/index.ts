@@ -55,10 +55,10 @@ class ProtectionEditor extends CustomEditor {
 
     const label = ` ${renderStatusLabel()} `;
     const labelWidth = visibleWidth(label);
-    const last = lines.length - 1;
+    const first = 0;
 
     if (width > labelWidth + 4) {
-      lines[last] = label + truncateToWidth(lines[last]!, width - labelWidth, "");
+      lines[first] = label + truncateToWidth(lines[first]!, width - labelWidth, "");
     }
 
     return lines;
