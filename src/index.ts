@@ -7,6 +7,7 @@ import { registerDeleteProtection } from "./delete-protection";
 import { registerEditProtection } from "./edit-protection";
 import { registerGitProtection } from "./git-protection";
 import { registerPrivilegeProtection } from "./privilege-protection";
+import { registerUserMessageRenderer } from "./user-message-renderer";
 import { state } from "./constants";
 import { osNotify } from "./os-notify";
 
@@ -211,6 +212,7 @@ export default function (pi: ExtensionAPI) {
   registerEditProtection(pi);
   registerGitProtection(pi);
   registerPrivilegeProtection(pi);
+  registerUserMessageRenderer(pi);
 
   pi.on("session_start", async (_event, ctx) => {
     const config = loadConfig();
