@@ -117,13 +117,21 @@ class ProtectionEditor extends CustomEditor {
     const lines = super.render(width);
     if (lines.length === 0) return lines;
 
-    const label = ` ${renderStatusLabel(this.frame)} `;
-    const labelWidth = visibleWidth(label);
-    const first = 0;
+    const CYAN = "\x1b[38;2;34;211;238m";
+    const R    = "\x1b[0m";
 
-    if (width > labelWidth + 4) {
-      lines[first] = truncateToWidth(lines[first]!, width - labelWidth, "") + label;
-    }
+    const label      = ` ${renderStatusLabel(this.frame)} `;
+    const labelWidth = visibleWidth(label);
+
+    const stripAnsi = (s: string) => s.replace(/\x1b\[[^m]*m/g, "");
+
+    // Top border: strip existing colors, apply cyan, add shield label
+    const topClean = stripAnsi(truncateToWidth(lines[0]!, width - labelWidth, ""));
+    lines[0] = `${CYAN}${topClean}${R}` + label;
+
+    // Bottom border: strip existing colors, apply cyan
+    const last = lines.length - 1;
+    lines[last] = `${CYAN}${stripAnsi(lines[last]!)}${R}`;
 
     return lines;
   }
