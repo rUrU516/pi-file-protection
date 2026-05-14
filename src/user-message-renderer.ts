@@ -6,13 +6,10 @@ import {
 } from "@mariozechner/pi-coding-agent";
 import { Markdown, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
-
 type ThemeLike = {
   fg(color: ThemeColor, text: string): string;
   bold(text: string): string;
   italic(text: string): string;
-  dim?(text: string): string;
 };
 
 type PatchedProto = {
@@ -22,8 +19,6 @@ type PatchedProto = {
   __getTheme?: () => ThemeLike | undefined;
   children?: unknown[];
 };
-
-// ─── Helpers ───────────────────────────────────────────────────────────────────
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v);
@@ -39,8 +34,6 @@ function findMarkdownText(node: unknown): string | undefined {
   return undefined;
 }
 
-// ─── Render ────────────────────────────────────────────────────────────────────
-
 function renderStyledMessage(
   instance: PatchedProto,
   width: number,
@@ -49,46 +42,27 @@ function renderStyledMessage(
   const text = findMarkdownText(instance);
   if (text === undefined) return undefined;
 
-  const indent = "  ";
-  const indentW = 2;
-  const bodyWidth = Math.max(1, width - indentW);
+  // Bold colored vertical bar — amp-themes style
+  const bar = theme ? theme.fg("accent", theme.bold("▌")) : "▌";
+  const barW = visibleWidth(bar);
+  const contentWidth = Math.max(1, width - barW);
 
-  // Render markdown — inject color + italic directly so ANSI resets don't clobber it
   const md = new Markdown(text, 0, 0, getMarkdownTheme(), {
     color: (t: string) => theme ? theme.fg("userMessageText", t) : t,
     italic: true,
   });
-  const mdLines = md.render(bodyWidth);
+  const mdLines = md.render(contentWidth);
   const body = mdLines.length > 0 ? mdLines : [""];
-
-  const corner = (s: string) =>
-    theme ? theme.fg("accent", theme.bold(s)) : s;
-
-  // Content lines: indented (color + italic already baked in by Markdown)
-  const contentLines = body.map((line) => {
-    const clipped = truncateToWidth(line, bodyWidth, "");
-    return `${indent}${clipped}`;
-  });
-
-  // ╯ aligned to content end, with a short leading dash
-  const maxContentW = Math.max(...body.map((l) => {
-    const plain = l.replace(/\x1b\[[^m]*m/g, "").trimEnd();
-    return visibleWidth(plain);
-  }));
-  // closing: "   ─╯"  (pad to content end, then ─╯)
-  const closingCol = Math.min(indentW + maxContentW + 3, width - 2);
-  const closingPad = " ".repeat(Math.max(0, closingCol));
-  const closing = `${closingPad}${corner("─╯")}`;
 
   return [
     "",
-    corner("╭─"),
-    ...contentLines,
-    closing,
+    ...body.map((line) => {
+      const clipped = truncateToWidth(line, contentWidth, "");
+      const pad = " ".repeat(Math.max(0, contentWidth - visibleWidth(clipped)));
+      return `${bar}${clipped}${pad}`;
+    }),
   ];
 }
-
-// ─── Prototype patch ───────────────────────────────────────────────────────────
 
 function applyPatch(getTheme: () => ThemeLike | undefined): void {
   const proto = UserMessageComponent.prototype as unknown as PatchedProto;
@@ -103,8 +77,6 @@ function applyPatch(getTheme: () => ThemeLike | undefined): void {
     return styled ?? orig.call(this, width);
   };
 }
-
-// ─── Registration ──────────────────────────────────────────────────────────────
 
 export function registerUserMessageRenderer(pi: ExtensionAPI): void {
   let activeTheme: ThemeLike | undefined;
