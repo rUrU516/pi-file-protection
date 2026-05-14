@@ -125,11 +125,21 @@ class ProtectionEditor extends CustomEditor {
 
     const stripAnsi = (s: string) => s.replace(/\x1b\[[^m]*m/g, "");
 
-    // Top border: strip existing colors, apply cyan, add shield label
-    const topClean = stripAnsi(truncateToWidth(lines[0]!, width - labelWidth, ""));
-    lines[0] = `${CYAN}${topClean}${R}` + label;
+    // Label position: starts at col 6, gets pushed right by input text
+    const firstLine  = this.getText().split("\n")[0] ?? "";
+    const textW      = visibleWidth(firstLine);
+    const defaultPos = 6;
+    const labelPos   = Math.min(width - labelWidth, Math.max(defaultPos, textW + 1));
 
-    // Bottom border: strip existing colors, apply cyan
+    // Top border: cyan dashes, label at labelPos, cyan dashes to end
+    const borderChar = "─";
+    const topBorder  =
+      `${CYAN}${borderChar.repeat(labelPos)}${R}` +
+      label +
+      `${CYAN}${borderChar.repeat(Math.max(0, width - labelPos - labelWidth))}${R}`;
+    lines[0] = topBorder;
+
+    // Bottom border: cyan
     const last = lines.length - 1;
     lines[last] = `${CYAN}${stripAnsi(lines[last]!)}${R}`;
 
