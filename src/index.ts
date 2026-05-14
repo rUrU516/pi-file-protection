@@ -122,7 +122,7 @@ class ProtectionEditor extends CustomEditor {
     const first = 0;
 
     if (width > labelWidth + 4) {
-      lines[first] = label + truncateToWidth(lines[first]!, width - labelWidth, "");
+      lines[first] = truncateToWidth(lines[first]!, width - labelWidth, "") + label;
     }
 
     return lines;

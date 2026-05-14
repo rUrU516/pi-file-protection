@@ -6,6 +6,7 @@ const R    = "\x1b[0m";
 const BOLD = "\x1b[1m";
 const DIM  = "\x1b[2m";
 const CYAN = "\x1b[38;2;34;211;238m"; // cyan-400
+const BLACK = "\x1b[38;2;80;80;80m";   // dark gray / near-black
 
 type ThemeLike = {
   fg(color: ThemeColor, text: string): string;
@@ -41,10 +42,10 @@ function applyToolPatch(getTheme: () => ThemeLike | undefined): void {
 
     // ▌ 颜色：pending=dim cyan，error=红，done=full cyan
     const bar = this.isPartial
-      ? `${DIM}${CYAN}${BOLD}▌${R}`
+      ? `${DIM}${BLACK}${BOLD}▌${R}`
       : this.result?.isError
         ? (theme ? theme.fg("error", theme.bold("▌")) : `${BOLD}▌${R}`)
-        : `${CYAN}${BOLD}▌${R}`;
+        : `${BLACK}${BOLD}▌${R}`;
 
     return lines.map((line) =>
       `${bar}${truncateToWidth(stripBg(line), width - 1, "")}`

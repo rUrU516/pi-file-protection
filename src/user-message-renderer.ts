@@ -43,7 +43,8 @@ function renderStyledMessage(
   if (text === undefined) return undefined;
 
   // Bold colored vertical bar — amp-themes style
-  const bar = theme ? theme.fg("accent", theme.bold("▌")) : "▌";
+  const CYAN = "\x1b[38;2;34;211;238m";
+  const bar = `${CYAN}\x1b[1m▌\x1b[0m`;
   const barW = visibleWidth(bar);
   const contentWidth = Math.max(1, width - barW);
 
