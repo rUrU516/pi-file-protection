@@ -2,11 +2,10 @@ import { ToolExecutionComponent } from "@mariozechner/pi-coding-agent";
 import type { ExtensionAPI, ThemeColor } from "@mariozechner/pi-coding-agent";
 import { truncateToWidth } from "@mariozechner/pi-tui";
 
-const R    = "\x1b[0m";
-const BOLD = "\x1b[1m";
-const DIM  = "\x1b[2m";
-const CYAN = "\x1b[38;2;34;211;238m"; // cyan-400
-const BLACK = "\x1b[38;2;80;80;80m";   // dark gray / near-black
+const R     = "\x1b[0m";
+const BOLD  = "\x1b[1m";
+const DIM   = "\x1b[2m";
+const BLACK = "\x1b[38;2;80;80;80m";
 
 type ThemeLike = {
   fg(color: ThemeColor, text: string): string;
@@ -40,7 +39,6 @@ function applyToolPatch(getTheme: () => ThemeLike | undefined): void {
     const lines = (ToolExecutionComponent.prototype as unknown as PatchedProto).__origRender!.call(this, width);
     const theme = (ToolExecutionComponent.prototype as unknown as PatchedProto).__getTheme?.();
 
-    // ▌ 颜色：pending=dim cyan，error=红，done=full cyan
     const bar = this.isPartial
       ? `${DIM}${BLACK}${BOLD}▌${R}`
       : this.result?.isError
