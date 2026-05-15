@@ -2,10 +2,11 @@ import { ToolExecutionComponent } from "@mariozechner/pi-coding-agent";
 import type { ExtensionAPI, ThemeColor } from "@mariozechner/pi-coding-agent";
 import { truncateToWidth } from "@mariozechner/pi-tui";
 
-const R     = "\x1b[0m";
-const BOLD  = "\x1b[1m";
-const DIM   = "\x1b[2m";
-const BLACK = "\x1b[38;2;80;80;80m";
+const R          = "\x1b[0m";
+const BOLD       = "\x1b[1m";
+const DIM        = "\x1b[2m";
+const GREEN_DIM  = "\x1b[38;2;60;140;60m";   // 执行中：暗绿
+const GREEN_BRIGHT = "\x1b[38;2;80;220;100m"; // 完成：亮绿
 
 type ThemeLike = {
   fg(color: ThemeColor, text: string): string;
@@ -40,10 +41,10 @@ function applyToolPatch(getTheme: () => ThemeLike | undefined): void {
     const theme = (ToolExecutionComponent.prototype as unknown as PatchedProto).__getTheme?.();
 
     const bar = this.isPartial
-      ? `${DIM}${BLACK}${BOLD}▌${R}`
+      ? `${DIM}${GREEN_DIM}${BOLD}▌${R}`
       : this.result?.isError
         ? (theme ? theme.fg("error", theme.bold("▌")) : `${BOLD}▌${R}`)
-        : `${BLACK}${BOLD}▌${R}`;
+        : `${GREEN_BRIGHT}${BOLD}▌${R}`;
 
     return lines.map((line) =>
       `${bar}${truncateToWidth(stripBg(line), width - 1, "")}`
