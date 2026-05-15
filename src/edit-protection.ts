@@ -2,6 +2,7 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { isToolCallEventType } from "@mariozechner/pi-coding-agent";
 import { CONFIRM_MESSAGE, state } from "./constants";
 import { osNotify } from "./os-notify";
+import { confirmWithReason } from "./confirm-utils";
 
 const CONFIRM_PATTERNS = [
   /\btruncate\b/i,   // e.g. truncate -s 0 filename.txt
@@ -18,8 +19,8 @@ export function registerEditProtection(pi: ExtensionAPI) {
     if (isToolCallEventType("write", event)) {
         const detail = `✏️ write ${event.input.path}`;
         osNotify("π", detail);
-        const ok = await ctx.ui.confirm(CONFIRM_MESSAGE, `write ${event.input.path}`);
-        if (!ok) return { block: true, reason: "Refused by the user." };
+        const result = await confirmWithReason(ctx, CONFIRM_MESSAGE, `write ${event.input.path}`);
+        if (result) return result;
     }
   });
 
@@ -29,8 +30,8 @@ export function registerEditProtection(pi: ExtensionAPI) {
     if (isToolCallEventType("edit", event)) {
         const detail = `✏️ edit ${event.input.path}`;
         osNotify("π", detail);
-        const ok = await ctx.ui.confirm(CONFIRM_MESSAGE, `edit ${event.input.path}`);
-        if (!ok) return { block: true, reason: "Refused by the user." };
+        const result = await confirmWithReason(ctx, CONFIRM_MESSAGE, `edit ${event.input.path}`);
+        if (result) return result;
     }
   });
 
@@ -41,8 +42,8 @@ export function registerEditProtection(pi: ExtensionAPI) {
       if (CONFIRM_PATTERNS.some(pattern => pattern.test(event.input.command))) {
         const detail = `📟 ${event.input.command}`;
         osNotify("π", detail);
-        const ok = await ctx.ui.confirm(CONFIRM_MESSAGE, `${event.input.command}`);
-        if (!ok) return { block: true, reason: "Refused by the user." };
+        const result = await confirmWithReason(ctx, CONFIRM_MESSAGE, `${event.input.command}`);
+        if (result) return result;
       }
     }
   })

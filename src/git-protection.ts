@@ -2,6 +2,7 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { isToolCallEventType } from "@mariozechner/pi-coding-agent";
 import { CONFIRM_MESSAGE, state } from "./constants";
 import { osNotify } from "./os-notify";
+import { confirmWithReason } from "./confirm-utils";
 
 const GIT_BLACKLIST_PATTERNS = [
   /\bgit\s+push\b/i,
@@ -38,8 +39,8 @@ export function registerGitProtection(pi: ExtensionAPI) {
       if (shouldConfirmGit || shouldConfirmGh) {
         const detail = `📟 ${event.input.command}`;
         osNotify("π", detail);
-        const ok = await ctx.ui.confirm(CONFIRM_MESSAGE, `${event.input.command}`);
-        if (!ok) return { block: true, reason: "Refused by the user." };
+        const result = await confirmWithReason(ctx, CONFIRM_MESSAGE, `${event.input.command}`);
+        if (result) return result;
       }
     }
   });
