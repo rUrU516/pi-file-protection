@@ -62,6 +62,7 @@ function renderStyledMessage(
       const pad = " ".repeat(Math.max(0, contentWidth - visibleWidth(clipped)));
       return `${bar}${clipped}${pad}`;
     }),
+    "",
   ];
 }
 
